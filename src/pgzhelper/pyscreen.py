@@ -1,15 +1,18 @@
-import pgzero.screen as _pgzero_screen
-import pygame
-from pgzero.rect import Rect, ZRect
-from pgzero.clock import clock
-from pgzero.actor import Actor
-from pgzero.animation import animate
-from pgzero.constants import mouse as PGZeroMouse
 import os
-from typing import overload
+import sys
+import time
+import pygame
+import inspect
 from .shapes import *
 from .errors import *
+from typing import overload
+from pgzero.clock import clock
+from pgzero.actor import Actor
+from pgzero.rect import Rect, ZRect
+from pgzero.animation import animate
+import pgzero.screen as _pgzero_screen
 from . import _camera as pgz_camera
+from pgzero.constants import mouse as PGZeroMouse
 
 full_screen_rect = Rect(25, 25, 25, 25)
 is_full_screen = False

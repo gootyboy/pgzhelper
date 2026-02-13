@@ -89,5 +89,5 @@ For the camera to work, you must call pgzhelper_run.go(), not pgzrun.go()
 # Versions
 
 Version 0.0.1: Base code published
-(Latest) Version 0.0.2: Add documentation to all Screen functions and classes.
-Version 0.0.3: Add documentation to all Shape classes.
+(Latest) Version 0.0.2: Fix errors and bugs
+Version 0.0.3: Add documentation to all Screen functions and classes.
