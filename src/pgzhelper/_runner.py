@@ -1,7 +1,11 @@
-from .pyscreen import *
+"""Main runner for pgzhelper. Use pgzhelper_run.go() instead of _runner.go()"""
 
-def go(): 
-    global draw_frames_per_second
+from .pyscreen import *
+from .pyscreen import _screen, _update_fps, _draw_fps
+
+def go() -> None:
+    """Runs the pgzero script"""
+    global _draw_fps, _screen, _update_fps
     caller_frame = sys._getframe(1)
     caller_globals = caller_frame.f_globals
 
@@ -15,9 +19,9 @@ def go():
             if 'draw' in functions:
                 functions['draw']()
             if pgz_camera.is_camera_loaded():
-                pgz_camera.camera_draw_func(pgzero_screen)
-            if draw_frames_per_second:
-                time.sleep(1 / draw_frames_per_second)
+                pgz_camera.camera_draw_func(_screen)
+            if _draw_fps:
+                time.sleep(1 / _draw_fps)
 
         def ton_mouse_down(pos, button):
             if 'on_mouse_down' in functions:
@@ -57,8 +61,8 @@ def go():
         def tupdate():
             if 'update' in functions:
                 functions['update']()
-            if update_frames_per_second:
-                time.sleep(1 / update_frames_per_second)
+            if _update_fps:
+                time.sleep(1 / _update_fps)
             if pgz_camera.is_camera_loaded():
                 pgz_camera.camera_update_func()
         

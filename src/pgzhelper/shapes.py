@@ -1,11 +1,6 @@
-from __future__ import annotations
-import math
-from pgzero.rect import Rect, ZRect
-import pygame
-from typing import overload, Union
-from collide_circle import rect_collides_with_circle, circle_collides_with_circle
-from enum import Enum
-import pygame
+"""All of pgzhelper's shapes are found here."""
+
+from .utilities import *
 
 TRIANGLE_CENTER = ("center")
 TOP = "top"

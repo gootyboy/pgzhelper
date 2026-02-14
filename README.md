@@ -6,6 +6,9 @@ as camera and changing the frames per second will fail.
 # Do not import Screen as screen
 as screen will overload the pgzero-screen making all capabilities fail.
 
+
+
+
 Helper package to pgzero. Has addition capabilities such as showing the camera. Some capabilities can also be used in pygame.
 
 The first line of your draw function must include `init(screen)`
@@ -18,7 +21,7 @@ Example (assuming that Screen creates its own surface):
 
 ```python
 def draw():
-    Screen.fill("blue") # Makes the screen blue
+    Screen.fill("blue") # Makes the screen blue.
 ```
 
 ```python
@@ -26,15 +29,14 @@ def draw():
     Screen.fill("blue")
     Screen.draw.text("hi", topleft=(100, 100))
     screen.draw.text("bye", topleft=(200, 200)) # You can only see "hi" because Screen is 
-    # overloading the screen. With the init(),
-    # you would see both the hi and the bye.
+    # overloading the screen. With the init(), you would see both the "hi" and the "bye".
 ```
 
 This means, that, your draw function can have some Screen drawings and some screen drawings, and the output won't be affected. So, an action in one of them affects the other.
 
 # Advantages of using Screen:
 
-All of the Screen functions have the exact same capabilities as the screen functions, just with some more such as drawing lines with 5 thickness.
+All of the Screen functions have the exact same capabilities as the screen functions, just with some more such as drawing lines with thickness.
 
 Also, all of the Screen functions have full documentation, so you do not have to go to the pgzero website to find out what functions and what parameters there are.
 
@@ -42,7 +44,7 @@ Also, all of the Screen functions have full documentation, so you do not have to
 
 thickness parameter for line drawing and drawing rects.
 
-Drawing polygons
+Drawing shapes (polygons, ... (see shape list below))
 
 set the window position (on the laptop)
 
@@ -54,9 +56,9 @@ Changing the frames per second in the functions (For the this to work, you must 
 
 Shapes:
 
-HRect (helper rect) class that has .collidecircle()
+HRect (helper rect) class
 
-Circle class that has .colliderect(), .collidecircle(), .collidepoint()
+Circle class
 
 Shape class
 
@@ -88,6 +90,12 @@ For the camera to work, you must call pgzhelper_run.go(), not pgzrun.go()
 
 # Versions
 
-Version 0.0.1: Base code published
-(Latest) Version 0.0.2: Fix errors and bugs
-Version 0.0.3: Add documentation to all Screen functions and classes.
+Version 0.0.1: Base code published.
+
+Version 0.0.2: Fix errors and bugs.
+
+Version 0.0.3: Complete Documentation.
+
+(Latest) Version 0.0.4: Add changing frames per second for all functions. Add additional on_mouse_drag(pos, button) function.
+
+Version 0.0.5: Add dimond-square package into pgzhelper so that you don't have to do .for_draw(), .for_update(), etc. for terrains.

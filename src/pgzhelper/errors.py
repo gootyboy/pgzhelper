@@ -1,53 +1,71 @@
+"""All of pgzhelper's errors are found here."""
+
 class ScreenError(Exception):
-    pass
+    """Base error class for all errors in pgzhelper."""
+    def __init__(self, *args):
+        """
+        Base error class for all errors in pgzhelper.
+        
+        :param args: The messsage to be shown when error is raised.
+        """
+        super().__init__(*args)
 
 class MouseError(ScreenError):
-    pass
+    """Error for all mouse-related errors (setting the mouse shape)"""
+    def __init__(self, *args):
+        """
+        Error for all mouse-related errors (setting the mouse shape)
+        
+        :param args: The messsage to be shown when error is raised.
+        """
+        super().__init__(*args)
 
 class InitError(ScreenError):
-    pass
+    """Error for when you draw before init(screen) is called."""
+    def __init__(self, *args):
+        """
+        Error for when you draw before init(screen) is called.
+
+        :param args: The messsage to be shown when error is raised.
+        """
+        super().__init__(*args)
 
 class ThicknessError(ScreenError):
-    pass
+    """Error class for when thickness is less than or equal to 0."""
+    def __init__(self, *args):
+        """
+        Error class for when thickness is less than or equal to 0.
 
-class EllipseThicknessError(ThicknessError):
-    pass
-
-class PolygonThicknessError(ThicknessError):
-    pass
-
-class CircleThicknessError(EllipseThicknessError):
-    pass
-
-class QuadrilateralThicknessError(PolygonThicknessError):
-    pass
-
-class RectangleThicknessError(QuadrilateralThicknessError):
-    pass
-
-class SquareThicknessError(RectangleThicknessError):
-    pass
+        :param args: The messsage to be shown when error is raised.
+        """
+        super().__init__(*args)
 
 class ShapeError(ScreenError):
-    pass
+    """Error class for any incorrect shapes and for any errors in shapes."""
+    def __init__(self, *args):
+        """
+        Error class for any incorrect shapes and for any errors in shapes.
 
-class EllipseError(ShapeError):
-    pass
+        :param args: The messsage to be shown when error is raised.
+        """
+        super().__init__(*args)
 
-class PolygonError(ShapeError):
-    pass
+class CameraNotLoadedError(ScreenError):
+    """Error class for when the camera is drawn before it is loaded."""
+    def __init__(self, *args):
+        """
+        Error class for when the camera is drawn before it is loaded.
 
-class CircleError(EllipseError):
-    pass
+        :param args: The messsage to be shown when error is raised.
+        """
+        super().__init__(*args)
 
-class QuadrilateralError(PolygonError):
-    pass
+class FPSError(ScreenError):
+    """Error class for when the FPS for a function is less than or equal to 0."""
+    def __init__(self, *args):
+        """
+        Error class for when the FPS for a function is less than or equal to 0.
 
-class RectangleError(QuadrilateralError):
-    pass
-
-class SquareError(RectangleError):
-    pass
-
-class TrapezoidError(RectangleError):
-    pass
+        :param args: The messsage to be shown when error is raised.
+        """
+        super().__init__(*args)

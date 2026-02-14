@@ -1,42 +1,36 @@
-import os
-import sys
-import time
-import pygame
-import inspect
-from .shapes import *
-from .errors import *
-from typing import overload
-from pgzero.clock import clock
-from pgzero.actor import Actor
-from pgzero.rect import Rect, ZRect
-from pgzero.animation import animate
-import pgzero.screen as _pgzero_screen
-from . import _camera as pgz_camera
-from pgzero.constants import mouse as PGZeroMouse
+"""Main file of pgzhelper."""
+from .utilities import *
+from .utilities import _pgzero_screen
 
-full_screen_rect = Rect(25, 25, 25, 25)
-is_full_screen = False
-pgzero_drawer = None
-pgzero_screen = None
-width_increase = 0
-height_increase = 0
-resize_mouse_down = False
-resize_mouse_down_pos = (0, 0)
-window_pos = (200, 200)
-draw_frames_per_second = None
-update_frames_per_second = None
-full_screen_removed = True
-resizing_removed = True
-inited = False
+_drawer = None
+_screen = None
+_draw_fps = 60
+_update_fps = 60
+_inited = False
 
-def load_camera(camera_number = 0):
+def load_camera(camera_number: int = 0) -> None:
+    """
+    Loads a camera.
+
+    :param camera_number: If you have more than 1 camera, then 0 will be one of the cameras and 1 will be the other one.
+    """
     pgz_camera.load_camera(camera_number)
 
-def remove_camera_background(color = (255, 255, 255)):
+def remove_camera_background(color: tuple[float, float, float] | str = (255, 255, 255)) -> None:
+    """
+    Removes the camera output's background
+
+    :param color: The color to replace the background with. Defaults to (255, 255, 255).
+    """
     pgz_camera.remove_background(color)
 
-def set_camera_zoom_factor(factor):
-    pgz_camera.set_zoom_factor = factor
+def set_camera_zoom_factor(factor: float) -> None:
+    """
+    Sets the camera zoom factor
+
+    :param factor: How zoomed in it should be. 1 means it shows the full camera view. 2 means it zooms into the center of the camera by a factor of 2.
+    """
+    pgz_camera.set_zoom_factor(factor)
 
 def init(surface):
     """
@@ -46,10 +40,10 @@ def init(surface):
 
     :param surface: The screen/surface which to initilize to.
     """
-    global pgzero_drawer, pgzero_screen, inited
-    pgzero_screen = surface
-    pgzero_drawer = _pgzero_screen.SurfacePainter(pgzero_screen)
-    inited = True
+    global _drawer, _screen, _inited
+    _screen = surface
+    _drawer = _pgzero_screen.SurfacePainter(_screen)
+    _inited = True
 
 def _init_check():
     """
@@ -57,32 +51,54 @@ def _init_check():
 
     Not meant for user use.
 
-    :raise ScreenError: When the pgzero_surface or the pgzero_screen is None.
+    :raise InitError: When the pgzero_surface or the pgzero_screen is None.
     """
-    if pgzero_drawer == None or pgzero_screen == None:
-        raise ScreenError("Screen must be initilized before drawing. In your draw function add \"init(screen)\" for the first line.")
+    if not _inited:
+        raise InitError("Screen must be initilized before drawing. In your draw function add \"init(screen)\" for the first line.")
 
 class Screen:
     """Class for all of the screen drawing, positioning, ..."""
-    def __init__(self, surface):
-        init(surface)
-
     @staticmethod
     def set_position(x: float | int, y: float | int) -> None:
         """
-        Function to set the start position of the screen. Must be at the top of your code after the imports or else the function will not work.
+        Function to set the start position of the screen.
 
         :param x: The x coordinate of the position.
         :param y: The y coordinate of the position.
         """
+        os.environ['SDL_VIDEO_CENTERED'] = '0'
         os.environ['SDL_VIDEO_WINDOW_POS'] = f"{x},{y}"
 
     @staticmethod
     def center_window() -> None:
         """
-        Function to center the screen. Must be at the top of your code after the imports or else the function will not work.
+        Function to center the screen.
         """
         os.environ['SDL_VIDEO_CENTERED'] = '1'
+
+    @staticmethod
+    def is_window_centered() -> bool:
+        """
+        Function to check if the window is centered. When the user moves the window to the topleft of the screen, it is still considered centered.
+
+        :return True: When the window is centered by the code.
+        :return False: When the window is not centered by the code.
+        """
+        if os.environ['SDL_VIDEO_CENTERED'] == '1':
+            return True
+        return False
+
+    @staticmethod
+    def get_window_pos() -> tuple[int, int] | Literal["center"]:
+        """
+        Gets the window position.
+        
+        :return tuple[int, int]: When the window is not centered.
+        :return "center": When the window is centered.
+        """
+        if Screen.is_window_centered():
+            return "center"
+        return tuple(map(int, os.environ["SDL_VIDEO_WINDOW_POS"].split(",")))
 
     @staticmethod
     def fill(color: tuple[float, float, float] | str) -> None:
@@ -91,10 +107,10 @@ class Screen:
 
         :param color: The color which to fill the screen with.
 
-        :raise ScreenError: When screen is not initilized with init(screen).
+        :raise InitError: When screen is not initilized with init(screen).
         """
         _init_check()
-        pgzero_screen.fill(color)
+        _screen.fill(color)
 
     @staticmethod
     @property
@@ -104,10 +120,10 @@ class Screen:
 
         :return pygame.Surface: The surface of screen.
 
-        :raise ScreenError: When screen is not initilized with init(screen).
+        :raise InitError: When screen is not initilized with init(screen).
         """
         _init_check()
-        return pgzero_screen.surface
+        return _screen.surface
     
     @staticmethod
     @property
@@ -118,10 +134,10 @@ class Screen:
         :return float: The height of the window in pixels
         :return int: The height of the window in pixels
 
-        :raise ScreenError: When screen is not initilized with init(screen).
+        :raise InitError: When screen is not initilized with init(screen).
         """
         _init_check()
-        return pgzero_screen.height
+        return _screen.height
     
     @staticmethod
     @property
@@ -132,10 +148,10 @@ class Screen:
         :return float: The height of the window in pixels
         :return int: The height of the window in pixels
 
-        :raise ScreenError: When screen is not initilized with init(screen).
+        :raise InitError: When screen is not initilized with init(screen).
         """
         _init_check()
-        return pgzero_screen.width
+        return _screen.width
 
     @staticmethod
     def clear() -> None:
@@ -144,10 +160,10 @@ class Screen:
             
             Screen.fill("black")
             
-        :raise ScreenError: When screen is not initilized with init(screen).
+        :raise InitError: When screen is not initilized with init(screen).
         """
         _init_check()
-        pgzero_screen.clear()
+        _screen.clear()
 
     @staticmethod
     def blit(image: str, pos: tuple[float, float] | list[float, float] = (0, 0)) -> None:
@@ -157,17 +173,28 @@ class Screen:
         :param image: The image name or path. When using image name, image must be saved in an images directory.
         :param pos: The position where to place the image.
 
-        :raise ScreenError: When screen is not initilized with init(screen).
+        :raise InitError: When screen is not initilized with init(screen).
         """
         _init_check()
-        pgzero_screen.blit(image, pos)
-    
+        _screen.blit(image, pos)
+
     @staticmethod
-    def lerp_color(color1, color2, t):
+    def lerp_color(color1: tuple[float, float, float], color2: tuple[float, float, float], t: int) -> tuple[float, float, float]:
+        """
+        Lerps a color. Useful for getting the current color in an gradient.
+        
+        :param color1: The start color of the gradient.
+        :param color2: The end color of the gradient.
+        :param t: The iteration number of the gradient.
+
+        :return tuple[float, float, float]: The color.
+        """
+        _init_check()
         r = color1[0] + t * (color2[0] - color1[0])
         g = color1[1] + t * (color2[1] - color1[1])
         b = color1[2] + t * (color2[2] - color1[2])
         return (int(r), int(g), int(b))
+
     class draw:
         """Class for drawing objects and texts to the Screen."""
         @staticmethod
@@ -211,35 +238,35 @@ class Screen:
             :param anchor: a length-2 sequence of horizontal and vertical anchor fractions. Defaults to (0.0, 0.0).
             :param angle: counterclockwise rotation angle in degrees. Defaults to 0 (No rotation).
 
-            :raise ScreenError: When screen is not initilized with init(screen).
+            :raise InitError: When screen is not initilized with init(screen).
             """
             _init_check()
             if topleft:
-                pgzero_drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, topleft=topleft,
+                _drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, topleft=topleft,
                 width=width, widthem=widthem, lineheight=lineheight, align=align, owidth=owidth, ocolor=ocolor, shadow=shadow, scolor=scolor, gcolor=gcolor, alpha=alpha, anchor=anchor, angle=angle)
             if bottomleft:
-                pgzero_drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, bottomleft=bottomleft,
+                _drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, bottomleft=bottomleft,
                 width=width, widthem=widthem, lineheight=lineheight, align=align, owidth=owidth, ocolor=ocolor, shadow=shadow, scolor=scolor, gcolor=gcolor, alpha=alpha, anchor=anchor, angle=angle)
             if topright:
-                pgzero_drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, topright=topright,
+                _drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, topright=topright,
                 width=width, widthem=widthem, lineheight=lineheight, align=align, owidth=owidth, ocolor=ocolor, shadow=shadow, scolor=scolor, gcolor=gcolor, alpha=alpha, anchor=anchor, angle=angle)
             if bottomright:
-                pgzero_drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, bottomright=bottomright,
+                _drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, bottomright=bottomright,
                 width=width, widthem=widthem, lineheight=lineheight, align=align, owidth=owidth, ocolor=ocolor, shadow=shadow, scolor=scolor, gcolor=gcolor, alpha=alpha, anchor=anchor, angle=angle)
             if midtop:
-                pgzero_drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, midtop=midtop,
+                _drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, midtop=midtop,
                 width=width, widthem=widthem, lineheight=lineheight, align=align, owidth=owidth, ocolor=ocolor, shadow=shadow, scolor=scolor, gcolor=gcolor, alpha=alpha, anchor=anchor, angle=angle)
             if midleft:
-                pgzero_drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, midleft=midleft,
+                _drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, midleft=midleft,
                 width=width, widthem=widthem, lineheight=lineheight, align=align, owidth=owidth, ocolor=ocolor, shadow=shadow, scolor=scolor, gcolor=gcolor, alpha=alpha, anchor=anchor, angle=angle)
             if midbottom:
-                pgzero_drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, midbottom=midbottom,
+                _drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, midbottom=midbottom,
                 width=width, widthem=widthem, lineheight=lineheight, align=align, owidth=owidth, ocolor=ocolor, shadow=shadow, scolor=scolor, gcolor=gcolor, alpha=alpha, anchor=anchor, angle=angle)
             if midright:
-                pgzero_drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, midright=midright,
+                _drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, midright=midright,
                 width=width, widthem=widthem, lineheight=lineheight, align=align, owidth=owidth, ocolor=ocolor, shadow=shadow, scolor=scolor, gcolor=gcolor, alpha=alpha, anchor=anchor, angle=angle)
             if center:
-                pgzero_drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, center=center,
+                _drawer.text(text, fontname=fontname, fontsize=fontsize, sysfontname=sysfontname, antialias=antialias, bold=bold, italic=italic, underline=underline, color=color, background=background, center=center,
                 width=width, widthem=widthem, lineheight=lineheight, align=align, owidth=owidth, ocolor=ocolor, shadow=shadow, scolor=scolor, gcolor=gcolor, alpha=alpha, anchor=anchor, angle=angle)
 
         @staticmethod
@@ -271,10 +298,10 @@ class Screen:
             :param alpha: Alpha transparency value between 0 and 1. Defaults to 1.0 (No transperency)
             :param angle: counterclockwise rotation angle in degrees. Defaults to 0 (No rotation).
 
-            :raise ScreenError: When screen is not initilized with init(screen).
+            :raise InitError: When screen is not initilized with init(screen).
             """
             _init_check()
-            pgzero_drawer.textbox(text, rect, fontname=fontname, sysfontname=sysfontname, lineheight=lineheight, anchor=anchor, bold=bold, italic=italic, underline=underline, antialias=antialias,
+            _drawer.textbox(text, rect, fontname=fontname, sysfontname=sysfontname, lineheight=lineheight, anchor=anchor, bold=bold, italic=italic, underline=underline, antialias=antialias,
                                 color=color, background=background, widthem=widthem, align=align, owidth=owidth, ocolor=ocolor, shadow=shadow, scolor=scolor, gcolor=gcolor, alpha=alpha, angle=angle)
 
         @staticmethod
@@ -287,7 +314,8 @@ class Screen:
             :param color: The color of the rect.
             :param thickness: The thickness of the outline of the rect.
 
-            :raise ScreenError: When screen is not initilized with init(screen).
+            :raise InitError: When screen is not initilized with init(screen).
+            :raise ThicknessError: When the thickness is less than 1.
             """
             ...
 
@@ -304,7 +332,8 @@ class Screen:
             :param color: The color of the rect.
             :param thickness: The thickness of the outline of the rect.
 
-            :raise ScreenError: When screen is not initilized with init(screen).
+            :raise InitError: When screen is not initilized with init(screen).
+            :raise ThicknessError: When the thickness is less than 1.
             """
             ...
 
@@ -317,20 +346,20 @@ class Screen:
                 else:
                     width = args[2]
                 if width == 0:
-                    raise ScreenError("Cannot draw a circle with 0 thickness")
+                    raise ThicknessError("Cannot draw a circle with 0 thickness")
                 elif width <= 0:
-                    raise ScreenError("Cannot draw a circle with negative thickness")
-                pygame.draw.rect(pgzero_screen.surface, args[1], args[0], width)
+                    raise ThicknessError("Cannot draw a circle with negative thickness")
+                pygame.draw.rect(_screen.surface, args[1], args[0], width)
             elif isinstance(args[0], (int, float)):
                 if len(args) == 2:
                     width = 1
                 else:
                     width = args[2]
                 if width == 0:
-                    raise ScreenError("Cannot draw a circle with 0 thickness")
+                    raise ThicknessError("Cannot draw a circle with 0 thickness")
                 elif width <= 0:
-                    raise ScreenError("Cannot draw a circle with negative thickness")
-                pygame.draw.rect(pgzero_screen.surface, args[4], Rect(args[0], args[1], args[2], args[3]), width)
+                    raise ThicknessError("Cannot draw a circle with negative thickness")
+                pygame.draw.rect(_screen.surface, args[4], Rect(args[0], args[1], args[2], args[3]), width)
 
         @staticmethod
         @overload
@@ -341,7 +370,7 @@ class Screen:
             :param rect: The rect to draw on the screen.
             :param color: The color of the rect.
 
-            :raise ScreenError: When screen is not initilized with init(screen).
+            :raise InitError: When screen is not initilized with init(screen).
             """
             ...
         
@@ -357,7 +386,7 @@ class Screen:
             :param height: The height of the rect.
             :param color: The color of the rect.
 
-            :raise ScreenError: When screen is not initilized with init(screen).
+            :raise InitError: When screen is not initilized with init(screen).
             """
             ...
 
@@ -365,9 +394,9 @@ class Screen:
         def filled_rect(*args) -> None:
             _init_check()
             if len(args) == 2:
-                pgzero_drawer.filled_rect(args[0], args[1])
+                _drawer.filled_rect(args[0], args[1])
             elif len(args) == 5:
-                pgzero_drawer.filled_rect(Rect(args[0], args[1], args[2], args[3]), args[4])
+                _drawer.filled_rect(Rect(args[0], args[1], args[2], args[3]), args[4])
 
         @staticmethod
         def line(start: tuple[float, float], end: tuple[float, float], color: tuple[float, float, float] | str, thickness: float | int = 1) -> Rect:
@@ -381,10 +410,10 @@ class Screen:
 
             :return Rect: The Rect that the line is drawn within (the circumscribed Rect).
 
-            :raise ScreenError: When the screen is not initialized with init(screen).
+            :raise InitError: When the screen is not initialized with init(screen).
             """
             _init_check()
-            return pygame.draw.line(pgzero_screen.surface, color, start, end, thickness)
+            return pygame.draw.line(_screen.surface, color, start, end, thickness)
         
         @staticmethod
         def polygon(points: list[tuple[float, float]], color: tuple[float, float, float] | str, thickness: float | int = 1) -> Rect:
@@ -397,10 +426,10 @@ class Screen:
 
             :return Rect: The Rect that the polygon is drawn within (the circumscribed Rect).
 
-            :raise ScreenError: When the screen is not initialized with init(screen).
+            :raise InitError: When the screen is not initialized with init(screen).
             """
             _init_check()
-            return pygame.draw.polygon(pgzero_screen.surface, color, points, thickness)
+            return pygame.draw.polygon(_screen.surface, color, points, thickness)
 
         @staticmethod
         @overload
@@ -413,7 +442,8 @@ class Screen:
             :param color: The color of the circle.
             :param thickness: The thickness of the line. Defaults to 1.
 
-            :raise ScreenError: When the screen is not initialized with init(screen) or when the thickness is less than or equal to 0.
+            :raise InitError: When the screen is not initialized with init(screen) or when the thickness is less than or equal to 0.
+            raise ThicknessError: When the thickness is less than 1.
             """
             ...
     
@@ -427,7 +457,8 @@ class Screen:
             :param color: The color of the circle.
             :param thickness: The thickness of the line. Defaults to 1.
 
-            :raise ScreenError: When the screen is not initialized with init(screen) or when the thickness is less than or equal to 0.
+            :raise InitError: When the screen is not initialized with init(screen) or when the thickness is less than or equal to 0.
+            :raise ThicknessError: When the thickness is less than 1.
             """
             ...
 
@@ -440,24 +471,24 @@ class Screen:
                 else:
                     width = 1
                 if width == 0:
-                    raise ScreenError("Cannot draw a circle with 0 thickness")
+                    raise ThicknessError("Cannot draw a circle with 0 thickness")
                 elif width <= 0:
-                    raise ScreenError("Cannot draw a circle with negative thickness")
-                return pygame.draw.circle(pgzero_screen.surface, args[2], args[0], args[1], width)
+                    raise ThicknessError("Cannot draw a circle with negative thickness")
+                return pygame.draw.circle(_screen.surface, args[2], args[0], args[1], width)
             elif isinstance(args[0], Circle):
                 if len(args) == 3:
                     width = args[2]
                 else:
                     width = 1
                 if width == 0:
-                    raise ScreenError("Cannot draw a circle with 0 thickness")
+                    raise ThicknessError("Cannot draw a circle with 0 thickness")
                 elif width <= 0:
-                    raise ScreenError("Cannot draw a circle with negative thickness")
-                return pygame.draw.circle(pgzero_screen.surface, args[1], args[0].center, args[0].radius, width)
+                    raise ThicknessError("Cannot draw a circle with negative thickness")
+                return pygame.draw.circle(_screen.surface, args[1], args[0].center, args[0].radius, width)
 
         @staticmethod
         @overload
-        def filled_circle(center: tuple[float, float], radius: int | float, color: tuple[float, float, float] | str) -> None:
+        def filled_circle(center: tuple[float, float], radius: float, color: tuple[float, float, float] | str) -> None:
             """
             Function to draw a circle to Screen.
 
@@ -465,7 +496,7 @@ class Screen:
             :param radius: The radius of the circle.
             :param color: The color of the circle.
 
-            :raise ScreenError: When the screen is not initialized with init(screen).
+            :raise InitError: When the screen is not initialized with init(screen).
             """
             ...
         
@@ -478,19 +509,28 @@ class Screen:
             :param circle: The circle.
             :param color: The color of the circle.
 
-            :raise ScreenError: When the screen is not initialized with init(screen).
+            :raise InitError: When the screen is not initialized with init(screen).
             """
 
         @staticmethod
         def filled_circle(*args):
             _init_check()
             if len(args) == 3:
-                pygame.draw.circle(pgzero_screen.surface, args[2], args[0], args[1], 0)
+                pygame.draw.circle(_screen.surface, args[2], args[0], args[1], 0)
             elif len(args) == 2:
-                pygame.draw.circle(pgzero_screen.surface, args[1], args[0].center, args[0].radius, 0)
+                pygame.draw.circle(_screen.surface, args[1], args[0].center, args[0].radius, 0)
 
         @staticmethod
-        def gradient_line(start_pos, end_pos, start_color, end_color, thickness = 1):
+        def gradient_line(start_pos: tuple[int, int], end_pos: tuple[int, int], start_color: tuple[float, float, float] | str, end_color: tuple[float, float, float] | str, thickness: int = 1) -> None:
+            """
+            Draws a gradient line onto the screen.
+
+            :param start_pos: The start position of the line.
+            :param end_pos: The end position of the line.
+            :param start_color: The starting color. This color will be placed at the start_pos.
+            :param end_color: The starting color. This color will be placed at the end_pos and a gradient will be drawn between those two points.
+            :param thickness: The thickness of the line.
+            """
             x1, y1 = start_pos
             x2, y2 = end_pos
             dx = x2 - x1
@@ -504,8 +544,7 @@ class Screen:
                 current_x = int(x1 + t * dx)
                 current_y = int(y1 + t * dy)
                 Screen.draw.filled_rect(Rect((current_x, current_y), (thickness, thickness)), current_color)
-
-
+  
     class cursor:
         """class for changing the cursor shape on the Screen."""
         arrow = pygame.SYSTEM_CURSOR_ARROW
@@ -526,31 +565,67 @@ class Screen:
         right_arrow = pygame.cursors.tri_right
 
         @staticmethod
-        def set_cursor(cursor) -> None:
+        def set_cursor(cursor: int | Cursor) -> None:
             """
             Sets the cursor shape to a specified cursor.
 
-            :param cursor: The cursor that the mouse should be. Use Screen.mouse. to get the accepted mouse shapes.
+            :param cursor: The cursor that the mouse should be. Use Screen.mouse to get the accepted mouse shapes.
             """
             pygame.mouse.set_cursor(cursor)
 
     class mouse:
+        """Class for getting the movements and clickes of the mouse."""
         wheel_down = PGZeroMouse.WHEEL_DOWN
         wheel_up = PGZeroMouse.WHEEL_UP
         left_click = PGZeroMouse.LEFT
         right_click = PGZeroMouse.RIGHT
 
-    class change_frames_per_second:
-        @staticmethod
-        def draw_func(frames_per_second):
-            global draw_frames_per_second
-            if frames_per_second <= 0:
-                raise ScreenError("Frames per second must be greater than 0.")
-            draw_frames_per_second = frames_per_second
-        
-        @staticmethod
-        def update_func(frames_per_second):
-            global update_frames_per_second
-            if frames_per_second <= 0:
-                raise ScreenError("Frames per second must be greater than 0.")
-            update_frames_per_second = frames_per_second
+    @staticmethod
+    def set_draw_fps(frames_per_second: int) -> None:
+        """
+        Changes the frames per second for the draw function.
+
+        :param frames_per_second: The frames per second for the draw function.
+
+        :raise InitError: When the screen is not initialized with init(screen).
+        :raise FPSError: When the frames per second is less than nonpositive (<= 0).
+        """
+        global _draw_fps
+        _init_check()
+        if frames_per_second <= 0:
+            raise FPSError("Frames per second must be greater than 0.")
+        _draw_fps = frames_per_second
+
+    @staticmethod
+    def set_update_fps(frames_per_second):
+        """
+        Changes the frames per second for the update function.
+
+        :param frames_per_second: The frames per second for the update function.
+
+        :raise InitError: When the screen is not initialized with init(screen).
+        :raise FPSError: When the frames per second is less than nonpositive (<= 0).
+        """
+        global _update_fps
+        _init_check()
+        if frames_per_second <= 0:
+            raise FPSError("Frames per second must be greater than 0.")
+        _update_fps = frames_per_second
+
+    @staticmethod
+    def get_draw_fps() -> int:
+        """
+        Gets the draw function's frames per second.
+
+        :return int: The frames per second.
+        """
+        return _draw_fps
+
+    @staticmethod
+    def get_update_fps() -> int:
+        """
+        Gets the update function's frames per second.
+
+        :return int: The frames per second.
+        """
+        return _update_fps
