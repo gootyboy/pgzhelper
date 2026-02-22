@@ -2,58 +2,67 @@
 
 ---
 
-## Run using pgzhelper_run.go(), not pgzrun.go()
+Helper package to pgzero. Has addition capabilities such as showing the camera. Some capabilities can also be used in pygame.
 
-If you do not run with pgzhelper_run.go(), then camera and changing the frames per second will fail.
+## Run using pgzhelper_run.go(), not pgzrun.go()
 
 ---
 
+If you do not run with pgzhelper_run.go(), then camera and changing the frames per second will fail.
+
 ## Do not import Screen as screen
+
+---
 
 If you import Screen as screen, then the pgzhelper-screen that you imported will overload the pgzero-screen making all capabilities fail.
 
 ## The first line of your draw function must include `init(screen)`
 
-If you do not include this, then pgzhelper will raise an InitError.
-
 ---
 
-Helper package to pgzero. Has addition capabilities such as showing the camera. Some capabilities can also be used in pygame.
+If you do not include this, then pgzhelper will raise an InitError.
+
+## Usage
+
+---
 
 In the draw function, when you pass in the screen parameter for init(screen), this is expecting the pgzero screen or the pygame display surface. For pgzero, just enter screen for the screen parameter. This will have a yellow underline under it, but do not worry because this is what is supposed to happen.
 
 If you do not call the init function, then any function that you run will raise a ScreenError. This is for making sure both the pgzero/pygame screen and the surface that Screen uses are both the same. If Screen makes a new surface, then doing one action in one of them will not affect the other.
 
-Example (assuming that Screen creates its own surface):
+Code Examples when `init(screen)` is not present (assuming that Screen creates its own surface):
 
 ```python
-# In a real code file, you must include a init(screen)
+# In a real code file, you must include a init(screen) or else the code will raise an InitError
 def draw():
-    Screen.fill("blue") # Makes the screen blue.
+    Screen.fill("blue") # Makes the screen blue using Screen
 ```
 
+You can see the blue screen. For this example, Screen creating its own surface does not affect anything.
+
 ```python
-# In a real code file, you must include a init(screen)
+# In a real code file, you must include a init(screen) or else the code will raise an InitError
 def draw():
-    Screen.fill("blue")
-    Screen.draw.text("hi", topleft=(100, 100))
-    screen.draw.text("bye", topleft=(200, 200)) # You can only see "hi" because Screen is 
-    # overloading the screen. With the init(), you would see both the "hi" and the "bye".
+    Screen.fill("blue") # Makes the screen blue using Screen
+    Screen.draw.text("hi", topleft=(100, 100)) # Draws text "hi" at position (100, 100) using Screen
+    screen.draw.text("bye", topleft=(200, 200)) # Draws text "bye" at position (200, 200) using screen
 ```
+
+You can only see "hi" because Screen is overloading the screen. With the init(), you would see both the "hi" and the "bye". For this example, Screen creating its own surface does affect thhe output.
 
 This means, that, your draw function can have some Screen drawings and some screen drawings, and the output won't be affected. So, an action in one of them affects the other.
 
----
-
 ## Advantages of using Screen
+
+---
 
 All of the Screen functions have the exact same capabilities as the screen functions, just with some more such as drawing lines with thickness.
 
 Also, all of the Screen functions have full documentation, so you do not have to go to the pgzero website to find out what functions and what parameters there are.
 
----
-
 ## Additional capabilities
+
+---
 
 thickness parameter for line drawing and drawing rects.
 
@@ -107,6 +116,8 @@ The EquilateralTriangle class includes a direction (DOWN or UP) parameter and th
 
 ## Versions
 
+---
+
 Version 0.0.1: Base code published.
 
 Version 0.0.2: Fix errors and bugs.
@@ -117,4 +128,6 @@ Version 0.0.3: Complete Documentation.
 
 ## Coming Soon
 
-Version 0.0.5: 
+---
+
+Version 0.0.5: Updates
