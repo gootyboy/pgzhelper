@@ -15,14 +15,27 @@ Pgzhelper is a helper package for pgzero that adds additional capabilities such 
 
 ---
 
+## Table of Contents
+- [Installation](#installation)
+- [Why Use Pgzhelper?](#why-use-pgzhelper)
+- [Additional Capabilities](#additional-capabilities)
+- [Shapes](#shapes)
+- [Usage](#usage)
+- [Advantages of Using Screen](#advantages-of-using-screen)
+- [Camera Capabilities](#camera-capabilities)
+- [Versions](#versions)
+- [Coming Soon](#coming-soon)
+
 ## Quick Start
+
+---
 
 ### Installation
 ```
 pip install pgzhelper
 ```
 
-### Minimal Example (Correct)
+### Minimal Correct Example
 ```python
 from pgzhelper import *
 
@@ -33,18 +46,6 @@ def draw():
 
 pgzhelper_run.go()
 ```
-
----
-
-## Table of Contents
-- [Why Use Pgzhelper?](#why-use-pgzhelper)
-- [Additional Capabilities](#additional-capabilities)
-- [Shapes](#shapes)
-- [Usage](#usage)
-- [Advantages of Using Screen](#advantages-of-using-screen)
-- [Camera Capabilities](#camera-capabilities)
-- [Versions](#versions)
-- [Coming Soon](#coming-soon)
 
 ---
 
@@ -106,6 +107,8 @@ def draw():
 ```
 
 ### Incorrect Usage Examples (missing init)
+
+These examples do not include init and explain why Screen cannot just create another surface.
 
 ```python
 def draw():
