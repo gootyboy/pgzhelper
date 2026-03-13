@@ -54,5 +54,5 @@ get camera width and height, the dimentions (in pixels) of how big the camera vi
 For the camera to work, you must call pgzhelper_run.go(), not pgzrun.go()
 """
 
-from .pyscreen import *
+from ._core import *
 from . import _runner as pgzhelper_run

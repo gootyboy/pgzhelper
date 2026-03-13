@@ -1,5 +1,4 @@
-"""Camera file for pgzhelper. Not meant for user use. Use load_camera() and other functions in pgzscreen instead of _camera."""
-
+from __future__ import annotations
 from .utilities import *
 
 _camera_loaded = False

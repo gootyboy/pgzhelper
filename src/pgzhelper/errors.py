@@ -2,7 +2,7 @@
 
 class ScreenError(Exception):
     """Base error class for all errors in pgzhelper."""
-    def __init__(self, *args):
+    def __init__(self, *args: object) -> None:
         """
         Base error class for all errors in pgzhelper.
         
@@ -12,7 +12,7 @@ class ScreenError(Exception):
 
 class MouseError(ScreenError):
     """Error for all mouse-related errors (setting the mouse shape)"""
-    def __init__(self, *args):
+    def __init__(self, *args: object) -> None:
         """
         Error for all mouse-related errors (setting the mouse shape)
         
@@ -22,7 +22,7 @@ class MouseError(ScreenError):
 
 class InitError(ScreenError):
     """Error for when you draw before init(screen) is called."""
-    def __init__(self, *args):
+    def __init__(self, *args: object) -> None:
         """
         Error for when you draw before init(screen) is called.
 
@@ -32,7 +32,7 @@ class InitError(ScreenError):
 
 class ThicknessError(ScreenError):
     """Error class for when thickness is less than or equal to 0."""
-    def __init__(self, *args):
+    def __init__(self, *args: object) -> None:
         """
         Error class for when thickness is less than or equal to 0.
 
@@ -42,7 +42,7 @@ class ThicknessError(ScreenError):
 
 class ShapeError(ScreenError):
     """Error class for any incorrect shapes and for any errors in shapes."""
-    def __init__(self, *args):
+    def __init__(self, *args: object) -> None:
         """
         Error class for any incorrect shapes and for any errors in shapes.
 
@@ -52,7 +52,7 @@ class ShapeError(ScreenError):
 
 class CameraNotLoadedError(ScreenError):
     """Error class for when the camera is drawn before it is loaded."""
-    def __init__(self, *args):
+    def __init__(self, *args: object) -> None:
         """
         Error class for when the camera is drawn before it is loaded.
 
@@ -62,9 +62,19 @@ class CameraNotLoadedError(ScreenError):
 
 class FPSError(ScreenError):
     """Error class for when the FPS for a function is less than or equal to 0."""
-    def __init__(self, *args):
+    def __init__(self, *args: object) -> None:
         """
         Error class for when the FPS for a function is less than or equal to 0.
+
+        :param args: The messsage to be shown when error is raised.
+        """
+        super().__init__(*args)
+
+class ImageLoadError(ScreenError):
+    """Error class for when an image cannot be loaded."""
+    def __init__(self, *args: object) -> None:
+        """
+        Error class for when an image cannot be loaded.
 
         :param args: The messsage to be shown when error is raised.
         """

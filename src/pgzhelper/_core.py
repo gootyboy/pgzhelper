@@ -1,15 +1,30 @@
-"""Main file of pgzhelper."""
+from __future__ import annotations
 from .utilities import *
-from .utilities import _pgzero_screen
+from .utilities import _pgzero_screen, _pygame_cursor, _camera
 
 _drawer = None
+"""The pgzero drawer."""
+
 _screen = None
+"""The pgzero screen."""
+
 _draw_fps = 60
+"""The draw function's frames per second."""
+
 _update_fps = 60
+"""The updates function's frames per second."""
+
 _on_mouse_down_fps = 60
+"""The on_mouse_down function's frames per second."""
+
 _on_mouse_move_fps = 60
+"""The on_mouse_move function's frames per second."""
+
 _on_mouse_up_fps = 60
+"""The on_mouse_up function's frames per second."""
+
 _inited = False
+"""If _init() is called yet."""
 
 def load_camera(camera_number: int = 0) -> None:
     """
@@ -17,15 +32,15 @@ def load_camera(camera_number: int = 0) -> None:
 
     :param camera_number: If you have more than 1 camera, then 0 will be one of the cameras and 1 will be the other one.
     """
-    pgz_camera.load_camera(camera_number)
+    _camera.load_camera(camera_number)
 
-def remove_camera_background(color: tuple[float, float, float] | str = (255, 255, 255)) -> None:
+def remove_camera_background(color: Union[tuple[float, float, float]] = (255, 255, 255)) -> None:
     """
     Removes the camera output's background
 
     :param color: The color to replace the background with. Defaults to (255, 255, 255).
     """
-    pgz_camera.remove_background(color)
+    _camera.remove_background(color)
 
 def set_camera_zoom_factor(factor: float) -> None:
     """
@@ -33,9 +48,9 @@ def set_camera_zoom_factor(factor: float) -> None:
 
     :param factor: How zoomed in it should be. 1 means it shows the full camera view. 2 means it zooms into the center of the camera by a factor of 2.
     """
-    pgz_camera.set_zoom_factor(factor)
+    _camera.set_zoom_factor(factor)
 
-def init(surface):
+def _init(surface: _pgzero_screen) -> None:
     """
     Function to initilize the screen. Called by using:
 
@@ -60,9 +75,9 @@ def _init_check():
         raise InitError("Screen must be initilized before drawing. In your draw function add \"init(screen)\" for the first line.")
 
 class Screen:
-    """Class for all of the screen drawing, positioning, ..."""
+    """Main Class for all of the screen drawing, positioning, ..."""
     @staticmethod
-    def set_position(x: float | int, y: float | int) -> None:
+    def set_position(x: int, y: int) -> None:
         """
         Function to set the start position of the screen.
 
@@ -89,10 +104,11 @@ class Screen:
         """
         if os.environ['SDL_VIDEO_CENTERED'] == '1':
             return True
+
         return False
 
     @staticmethod
-    def get_window_pos() -> tuple[int, int] | Literal["center"]:
+    def get_window_pos() -> Union[tuple[int, int],  Literal["center"]]:
         """
         Gets the window position.
         
@@ -104,7 +120,7 @@ class Screen:
         return tuple(map(int, os.environ["SDL_VIDEO_WINDOW_POS"].split(",")))
 
     @staticmethod
-    def fill(color: tuple[float, float, float] | str) -> None:
+    def fill(color: Union[tuple[int, int, int], str]) -> None:
         """
         Function to fill the screen with the specified color.
 
@@ -130,7 +146,7 @@ class Screen:
 
     @staticmethod
     @property
-    def height() -> float | int:
+    def height() -> int:
         """
         Property to get the height of the window.
         
@@ -167,7 +183,7 @@ class Screen:
         _screen.clear()
 
     @staticmethod
-    def blit(image: str, pos: tuple[float, float] | list[float, float] = (0, 0)) -> None:
+    def blit(image: str, pos: tuple[float, float] = (0, 0)) -> None:
         """
         Function to place an image to the Screen.
 
@@ -199,11 +215,12 @@ class Screen:
     class draw:
         """Class for drawing objects and texts to the Screen."""
         @staticmethod
-        def text(text: str, fontname: str | None = None, fontsize: int | float | None = None, sysfontname: str | None = None, antialias: bool = True, bold: bool | None = None, italic: bool | None = None, underline: bool | None = None, 
-                 color: tuple | str | None = None, background: tuple | str | None = None, topleft: tuple | None = None, bottomleft: tuple | None = None, topright: tuple | None = None, bottomright: tuple | None = None, midtop: tuple | None = None,
-                 midleft: tuple | None = None, midbottom: tuple | None = None, midright: tuple | None = None, center: tuple | None = None, width: float | None = None, widthem: float | None = None, lineheight: float | None = None, 
-                 align: str | None = None, owidth: float | None = None, ocolor: tuple | str | None = None, shadow: tuple | None = None, scolor: tuple | str | None =None, gcolor: tuple | str | None = None, alpha: float = 1.0, 
-                 anchor: tuple | None = None, angle: int | float = 0) -> None:
+        def text(text: str, fontname: Optional[str] = None, fontsize: Optional[int] = None, sysfontname: Optional[str] = None, antialias: bool = True, bold: bool = False, italic: bool = False, underline: bool = False, 
+                 color: Union[tuple[int, int, int], str] = "black", background: Union[tuple[int, int, int], str] = "black", topleft: Optional[tuple[int, int]] = None, bottomleft: Optional[tuple[int, int]] = None,
+                 topright: Optional[tuple[int, int]] = None, bottomright: Optional[tuple[int, int]] = None, midtop: Optional[tuple[int, int]] = None, midleft: Optional[tuple[int, int]] = None, midbottom: Optional[tuple[int, int]] = None,
+                 midright: Optional[tuple[int, int]] = None, center: Optional[tuple[int, int]] = None, width: float | None = None, widthem: float | None = None, lineheight: float | None = None, 
+                 align: Optional[str] = None, owidth: Optional[int] = None, ocolor: Union[tuple[int, int, int], str, None] = None, shadow: Optional[tuple[int, int]] = None, scolor: Union[tuple[int, int, int], str, None] = None,
+                 gcolor: Union[tuple[int, int, int], str, None] = None, alpha: float = 1.0, anchor: Optional[float] = None, angle: int = 0) -> None:
             """
             Function to draw text to the Screen.
 
@@ -271,9 +288,10 @@ class Screen:
                 width=width, widthem=widthem, lineheight=lineheight, align=align, owidth=owidth, ocolor=ocolor, shadow=shadow, scolor=scolor, gcolor=gcolor, alpha=alpha, anchor=anchor, angle=angle)
 
         @staticmethod
-        def textbox(text: str, rect: Rect | pygame.rect.Rect | ZRect, fontname: str | None = None, sysfontname: str | None = None, lineheight: float | None = None, anchor: float | None = None,  bold: bool | None = None, 
-                    italic: bool | None = None, underline: bool | None = None,  antialias: bool = True, color: str | tuple | None = None, background: str | tuple | None = None, widthem: float | None = None, align: str | None = None, 
-                    owidth: float | None = None, ocolor: tuple | str | None = None, shadow: tuple | None = None, scolor: tuple | str | None = None, gcolor: tuple | str | None = None, alpha: float = 1.0, angle: float = 0) -> None:
+        def textbox(text: str, rect: Rect, fontname: Optional[str] = None, sysfontname: Optional[str] = None, lineheight: Optional[int] = None, anchor: Optional[int] = None, bold: bool = False, italic: bool = False,
+                    underline: bool = False, antialias: bool = True, color: Union[tuple[int, int, int], str] = "black", background: Union[tuple[int, int, int], str, None] = None, widthem: Optional[int] = None, align: Optional[str] = None, 
+                    owidth: Optional[int] = None, ocolor: Union[tuple[int, int, int], str, None] = None, shadow: Optional[tuple[int, int]] = None, scolor: Union[tuple[int, int, int], str, None] = None,
+                    gcolor: Union[tuple[int, int, int], str, None] = None, alpha: float = 1.0, angle: int = 0) -> None:
             """
             Function to wrap text into a Rect.
 
@@ -307,7 +325,7 @@ class Screen:
 
         @staticmethod
         @overload
-        def rect(rect: Rect | pygame.rect.Rect | ZRect, color: tuple[float, float, float] | str, thickness: int | float = 1) -> None:
+        def rect(rect: Rect, color: Union[tuple[float, float, float], str], thickness: int = 1) -> None:
             """
             Function to draw a rect to the Screen. Draws the outline of the rect. If you want to draw the full, filled in rect, see Screen.draw.filled_rect().
 
@@ -322,7 +340,7 @@ class Screen:
 
         @staticmethod
         @overload
-        def rect(top: int | float, left: int | float, width: int | float, height: int | float, color: tuple[float, float, float] | str, thickness: int | float = 1) -> None:
+        def rect(top: int, left: int, width: int, height: int, color: Union[tuple[float, float, float], str], thickness: int = 1) -> None:
             """
             Function to draw a rect to the Screen. Draws the outline of the rect. If you want to draw the full, filled in rect, see Screen.draw.filled_rect().
 
@@ -339,9 +357,9 @@ class Screen:
             ...
 
         @staticmethod
-        def rect(*args):
+        def rect(*args: Union[Rect, tuple[int, int, int], str, int]):
             _init_check()
-            if isinstance(args[0], (Rect, pygame.rect.Rect, ZRect)):
+            if isinstance(args[0], Rect):
                 if len(args) == 2:
                     width = 1
                 else:
@@ -351,7 +369,7 @@ class Screen:
                 elif width <= 0:
                     raise ThicknessError("Cannot draw a circle with negative thickness")
                 pygame.draw.rect(_screen.surface, args[1], args[0], width)
-            elif isinstance(args[0], (int, float)):
+            elif isinstance(args[0], int):
                 if len(args) == 2:
                     width = 1
                 else:
@@ -364,7 +382,7 @@ class Screen:
 
         @staticmethod
         @overload
-        def filled_rect(rect: Rect | pygame.rect.Rect, color: tuple[float, float, float] | str) -> None:
+        def filled_rect(rect: Rect, color: Union[tuple[int, int, int], str]) -> None:
             """
             Function to draw a rect to the Screen. Draws the full, filled in rect. If you want to draw the outline of the rect, see Screen.draw.rect().
 
@@ -377,7 +395,7 @@ class Screen:
         
         @staticmethod
         @overload
-        def filled_rect(top: int | float, left: int | float, width: int | float, height: int | float, color: tuple[float, float, float] | str) -> None:
+        def filled_rect(top: int, left: int, width: int, height: int, color: Union[tuple[int, int, int], str]) -> None:
             """
             Function to draw a rect to the Screen. Draws the full, filled in rect. If you want to draw the outline of the rect, see Screen.draw.rect().
 
@@ -392,7 +410,7 @@ class Screen:
             ...
 
         @staticmethod
-        def filled_rect(*args) -> None:
+        def filled_rect(*args: Union[Rect, tuple[int, int, int], str, int]) -> None:
             _init_check()
             if len(args) == 2:
                 _drawer.filled_rect(args[0], args[1])
@@ -400,7 +418,7 @@ class Screen:
                 _drawer.filled_rect(Rect(args[0], args[1], args[2], args[3]), args[4])
 
         @staticmethod
-        def line(start: tuple[float, float], end: tuple[float, float], color: tuple[float, float, float] | str, thickness: float | int = 1) -> Rect:
+        def line(start: tuple[int, int], end: tuple[int, int], color: Union[tuple[int, int, int], str], thickness: int = 1) -> Rect:
             """
             Function to draw a line to Screen.
 
@@ -415,9 +433,10 @@ class Screen:
             """
             _init_check()
             return pygame.draw.line(_screen.surface, color, start, end, thickness)
-        
+
         @staticmethod
-        def polygon(points: list[tuple[float, float]], color: tuple[float, float, float] | str, thickness: float | int = 1) -> Rect:
+        @overload
+        def polygon(points: list[tuple[int, int]], color: Union[tuple[int, int, int], str], thickness: int = 1) -> Rect:
             """
             Function to draw a polygon to Screen.
 
@@ -429,12 +448,33 @@ class Screen:
 
             :raise InitError: When the screen is not initialized with init(screen).
             """
-            _init_check()
-            return pygame.draw.polygon(_screen.surface, color, points, thickness)
 
         @staticmethod
         @overload
-        def circle(center: tuple[float, float], radius: int | float, color: tuple[float, float, float] | str, thickness: float | int = 1) -> None:
+        def polygon(polygon: Polygon, color: Union[tuple[int, int, int], str], thickness: int = 1) -> Rect:
+            """
+            Function to draw a polygon to Screen.
+
+            :param polygon: The polygon.
+            :param color: The color of the line.
+            :param thickness: The thickness of the line. Defaults to 1.
+
+            :return Rect: The Rect that the polygon is drawn within (the circumscribed Rect).
+
+            :raise InitError: When the screen is not initialized with init(screen).
+            """
+
+        @staticmethod
+        def polygon(*args: Union[list[tuple[int, int]], tuple[int, int, int], Polygon, str, int]) -> Rect:
+            _init_check()
+            if isinstance(args[0], Polygon):
+                args[0] = args[0].points
+
+            return pygame.draw.polygon(_screen.surface, args[1], args[0], args[2])
+
+        @staticmethod
+        @overload
+        def circle(center: tuple[float, float], radius: int, color: Union[tuple[float, float, float], str], thickness: int = 1) -> Rect:
             """
             Function to draw a circle to Screen. Draws the outline of the circle. If you want to draw the full, filled in circle, see Screen.draw.filled_circle().
 
@@ -443,14 +483,15 @@ class Screen:
             :param color: The color of the circle.
             :param thickness: The thickness of the line. Defaults to 1.
 
+            :return Rect: The Rect that the Circle is drawn within (the circumscribed Rect).
+
             :raise InitError: When the screen is not initialized with init(screen) or when the thickness is less than or equal to 0.
             raise ThicknessError: When the thickness is less than 1.
             """
-            ...
     
         @staticmethod
         @overload
-        def circle(circle: Circle, color: tuple[float, float, float] | str, thickness: float | int = 1) -> None:
+        def circle(circle: Circle, color: Union[tuple[int, int, int], str], thickness: int = 1) -> Rect:
             """
             Function to draw a circle to Screen. Draws the outline of the circle. If you want to draw the full, filled in circle, see Screen.draw.filled_circle().
 
@@ -458,13 +499,14 @@ class Screen:
             :param color: The color of the circle.
             :param thickness: The thickness of the line. Defaults to 1.
 
+            :return Rect: The Rect that the Circle is drawn within (the circumscribed Rect).
+
             :raise InitError: When the screen is not initialized with init(screen) or when the thickness is less than or equal to 0.
             :raise ThicknessError: When the thickness is less than 1.
             """
-            ...
 
         @staticmethod
-        def circle(*args):
+        def circle(*args: Union[tuple[int, int], tuple[int, int, int], Circle, str, int]) -> Rect:
             _init_check()
             if isinstance(args[0], tuple):
                 if len(args) == 4:
@@ -489,7 +531,7 @@ class Screen:
 
         @staticmethod
         @overload
-        def filled_circle(center: tuple[float, float], radius: float, color: tuple[float, float, float] | str) -> None:
+        def filled_circle(center: tuple[int, int], radius: int, color: tuple[int, int, int] | str) -> Rect:
             """
             Function to draw a circle to Screen.
 
@@ -497,32 +539,35 @@ class Screen:
             :param radius: The radius of the circle.
             :param color: The color of the circle.
 
+            :return Rect: The Rect that the Circle is drawn within (the circumscribed Rect).
+
             :raise InitError: When the screen is not initialized with init(screen).
             """
-            ...
-        
+
         @staticmethod
         @overload
-        def filled_circle(circle: Circle, color: tuple[float, float, float] | str) -> None:
+        def filled_circle(circle: Circle, color: tuple[int, int, int] | str) -> Rect:
             """
             Function to draw a circle to Screen.
 
             :param circle: The circle.
             :param color: The color of the circle.
 
+            :return Rect: The Rect that the Circle is drawn within (the circumscribed Rect).
+
             :raise InitError: When the screen is not initialized with init(screen).
             """
 
         @staticmethod
-        def filled_circle(*args):
+        def filled_circle(*args: Union[tuple[int, int], tuple[int, int, int], Circle, str, int]) -> Rect:
             _init_check()
             if len(args) == 3:
-                pygame.draw.circle(_screen.surface, args[2], args[0], args[1], 0)
+                return pygame.draw.circle(_screen.surface, args[2], args[0], args[1], 0)
             elif len(args) == 2:
-                pygame.draw.circle(_screen.surface, args[1], args[0].center, args[0].radius, 0)
+                return pygame.draw.circle(_screen.surface, args[1], args[0].center, args[0].radius, 0)
 
         @staticmethod
-        def gradient_line(start_pos: tuple[int, int], end_pos: tuple[int, int], start_color: tuple[float, float, float] | str, end_color: tuple[float, float, float] | str, thickness: int = 1) -> None:
+        def gradient_line(start_pos: tuple[int, int], end_pos: tuple[int, int], start_color: Union[tuple[float, float, float], str], end_color: Union[tuple[float, float, float], str], thickness: int = 1) -> None:
             """
             Draws a gradient line onto the screen.
 
@@ -547,7 +592,7 @@ class Screen:
                 Screen.draw.filled_rect(Rect((current_x, current_y), (thickness, thickness)), current_color)
   
     class cursor:
-        """class for changing the cursor shape on the Screen."""
+        """Class for changing and gettong, the cursor shape on the Screen."""
         arrow = pygame.SYSTEM_CURSOR_ARROW
         hand = pygame.SYSTEM_CURSOR_HAND
         cross = pygame.SYSTEM_CURSOR_CROSSHAIR
@@ -566,7 +611,7 @@ class Screen:
         right_arrow = pygame.cursors.tri_right
 
         @staticmethod
-        def set_cursor(cursor: int | Cursor) -> None:
+        def set_cursor(cursor: Union[int, _pygame_cursor]) -> None:
             """
             Sets the cursor shape to a specified cursor.
 
@@ -574,12 +619,45 @@ class Screen:
             """
             pygame.mouse.set_cursor(cursor)
 
+        @staticmethod
+        def create_new(click_pos: tuple[int, int], file_name: str) -> _pygame_cursor:
+            """
+            Creates a new cursor image.
+
+            :click_pos: Where in the image shouldd be considered as a click.
+            :file_name: The file name or path for the image. File names are searched in the image directory.
+
+            :return Cursor: The pygame Cursor.
+            """
+            path = os.path.join("image", file_name)
+
+            if not os.path.exists(path):
+                ImageLoadError(f"Error: Cursor image not found at {path}")
+
+            try:
+                image = pygame.image.load(path).convert_alpha()
+            except pygame.error as e:
+                ImageLoadError(f"Error loading cursor image: {e}")
+
+            return _pygame_cursor(click_pos, image)
+
     class mouse:
         """Class for getting the movements and clickes of the mouse."""
+
         wheel_down = PGZeroMouse.WHEEL_DOWN
+        """When the scroll wheel is scrolled down."""
+
         wheel_up = PGZeroMouse.WHEEL_UP
+        """When the scroll wheel is scrolled up."""
+
         left_click = PGZeroMouse.LEFT
+        """When the left button is clicked on the mouse."""
+
         right_click = PGZeroMouse.RIGHT
+        """When the right button is clicked on the mouse."""
+
+        wheel_click = PGZeroMouse.MIDDLE
+        """When the scroll wheel is pressed."""
 
     @staticmethod
     def set_draw_fps(frames_per_second: int) -> None:
@@ -598,7 +676,7 @@ class Screen:
         _draw_fps = frames_per_second
 
     @staticmethod
-    def set_update_fps(frames_per_second):
+    def set_update_fps(frames_per_second: int) -> None:
         """
         Changes the frames per second for the update function.
 
@@ -614,7 +692,7 @@ class Screen:
         _update_fps = frames_per_second
 
     @staticmethod
-    def set_on_mouse_down_fps(frames_per_second):
+    def set_on_mouse_down_fps(frames_per_second: int) -> None:
         """
         Changes the frames per second for the on_mouse_down function.
 
@@ -630,7 +708,7 @@ class Screen:
         _on_mouse_down_fps = frames_per_second
 
     @staticmethod
-    def set_on_mouse_move_fps(frames_per_second):
+    def set_on_mouse_move_fps(frames_per_second: int) -> None:
         """
         Changes the frames per second for the on_mouse_move function.
 
@@ -646,7 +724,7 @@ class Screen:
         _on_mouse_move_fps = frames_per_second
 
     @staticmethod
-    def set_on_mouse_up_fps(frames_per_second):
+    def set_on_mouse_up_fps(frames_per_second: int) -> None:
         """
         Changes the frames per second for the on_mouse_up function.
 
