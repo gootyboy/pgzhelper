@@ -16,15 +16,15 @@ Pgzhelper is a helper package for pgzero that adds additional capabilities such 
 ---
 
 ## Table of Contents
-- [Installation](#installation)
-- [Why Use Pgzhelper?](#why-use-pgzhelper)
-- [Additional Capabilities](#additional-capabilities)
-- [Shapes](#shapes)
-- [Usage](#usage)
-- [Advantages of Using Screen](#advantages-of-using-screen)
-- [Camera Capabilities](#camera-capabilities)
-- [Versions](#versions)
-- [Coming Soon](#coming-soon)
+- Installation
+- Why Use Pgzhelper?
+- Additional Capabilities
+- Shapes
+- Usage
+- Advantages of Using Screen
+- Camera Capabilities
+- Versions
+- Coming Soon
 
 ## Quick Start
 
@@ -147,10 +147,11 @@ Screen functions have the same capabilities as pgzero’s screen functions, plus
 Version 0.0.1: Base code published.  
 Version 0.0.2: Fix errors and bugs.  
 Version 0.0.3: Complete documentation.  
-**(Latest) Version 0.0.4:** Add changing frames per second for all functions. Add additional `on_mouse_drag(pos, button)` function.
+**(Latest) Version 0.0.4:** Make init() into the injection, so the user does not have to use that. Add changing frames per second for all functions.
 
 ---
 
 ## Coming Soon
 
-Version 0.0.5: Updates
+Version 0.0.5: Completed Documentation
+Version 0.0.6: Add additional `on_mouse_drag(pos, button)` function.

@@ -16,6 +16,7 @@ def go() -> None:
                 functions[name] = obj
 
         def tdraw():
+            init(screen)
             if 'draw' in functions:
                 functions['draw']()
             if pgz_camera.is_camera_loaded():

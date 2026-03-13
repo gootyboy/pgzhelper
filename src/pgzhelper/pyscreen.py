@@ -6,6 +6,9 @@ _drawer = None
 _screen = None
 _draw_fps = 60
 _update_fps = 60
+_on_mouse_down_fps = 60
+_on_mouse_move_fps = 60
+_on_mouse_up_fps = 60
 _inited = False
 
 def load_camera(camera_number: int = 0) -> None:
@@ -124,14 +127,13 @@ class Screen:
         """
         _init_check()
         return _screen.surface
-    
+
     @staticmethod
     @property
     def height() -> float | int:
         """
-        Property to get the height of the window. Your HEIGHT constant will automatically change as the window resizes.
+        Property to get the height of the window.
         
-        :return float: The height of the window in pixels
         :return int: The height of the window in pixels
 
         :raise InitError: When screen is not initilized with init(screen).
@@ -141,12 +143,11 @@ class Screen:
     
     @staticmethod
     @property
-    def width() -> float | int:
+    def width() -> int:
         """
-        Property to get the height of the window. Your WIDTH constant will automatically change as the window resizes.
+        Property to get the height of the window.
         
-        :return float: The height of the window in pixels
-        :return int: The height of the window in pixels
+        :return int: The width of the window in pixels
 
         :raise InitError: When screen is not initilized with init(screen).
         """
@@ -613,6 +614,54 @@ class Screen:
         _update_fps = frames_per_second
 
     @staticmethod
+    def set_on_mouse_down_fps(frames_per_second):
+        """
+        Changes the frames per second for the on_mouse_down function.
+
+        :param frames_per_second: The frames per second for the on_mouse_down function.
+
+        :raise InitError: When the screen is not initialized with init(screen).
+        :raise FPSError: When the frames per second is less than nonpositive (<= 0).
+        """
+        global _on_mouse_down_fps
+        _init_check()
+        if frames_per_second <= 0:
+            raise FPSError("Frames per second must be greater than 0.")
+        _on_mouse_down_fps = frames_per_second
+
+    @staticmethod
+    def set_on_mouse_move_fps(frames_per_second):
+        """
+        Changes the frames per second for the on_mouse_move function.
+
+        :param frames_per_second: The frames per second for the on_mouse_move function.
+
+        :raise InitError: When the screen is not initialized with init(screen).
+        :raise FPSError: When the frames per second is less than nonpositive (<= 0).
+        """
+        global _on_mouse_move_fps
+        _init_check()
+        if frames_per_second <= 0:
+            raise FPSError("Frames per second must be greater than 0.")
+        _on_mouse_move_fps = frames_per_second
+
+    @staticmethod
+    def set_on_mouse_up_fps(frames_per_second):
+        """
+        Changes the frames per second for the on_mouse_up function.
+
+        :param frames_per_second: The frames per second for the on_mouse_up function.
+
+        :raise InitError: When the screen is not initialized with init(screen).
+        :raise FPSError: When the frames per second is less than nonpositive (<= 0).
+        """
+        global _on_mouse_up_fps
+        _init_check()
+        if frames_per_second <= 0:
+            raise FPSError("Frames per second must be greater than 0.")
+        _on_mouse_up_fps = frames_per_second
+
+    @staticmethod
     def get_draw_fps() -> int:
         """
         Gets the draw function's frames per second.
@@ -629,3 +678,30 @@ class Screen:
         :return int: The frames per second.
         """
         return _update_fps
+
+    @staticmethod
+    def get_on_mouse_down_fps() -> int:
+        """
+        Gets the update on_mouse_down's frames per second.
+
+        :return int: The frames per second.
+        """
+        return _on_mouse_down_fps
+
+    @staticmethod
+    def get_on_mouse_up_fps() -> int:
+        """
+        Gets the update on_mouse_up's frames per second.
+
+        :return int: The frames per second.
+        """
+        return _on_mouse_up_fps
+
+    @staticmethod
+    def get_on_mouse_move_fps() -> int:
+        """
+        Gets the update on_mouse_move's frames per second.
+
+        :return int: The frames per second.
+        """
+        return _on_mouse_move_fps
